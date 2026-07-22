@@ -116,7 +116,8 @@ static NSArray *removeItemsInList(NSArray *list, BOOL isFeed) {
 // Suggested posts/reels
 %hook IGMainFeedListAdapterDataSource
 - (NSArray *)objectsForListAdapter:(id)arg1 {
-    NSArray *filteredObjs = removeItemsInList(%orig, YES);
+    NSArray *originalObjs = %orig;
+    NSArray *filteredObjs = removeItemsInList(originalObjs, YES);
 
     // Remove loading spinner at end of feed (if 5 or less items in feed)
     NSUInteger arrayLength = [filteredObjs count];
@@ -134,7 +135,8 @@ static NSArray *removeItemsInList(NSArray *list, BOOL isFeed) {
 %end
 %hook IGSundialFeedDataSource
 - (NSArray *)objectsForListAdapter:(id)arg1 {
-    NSArray *filteredList = removeItemsInList(%orig, NO);
+    NSArray *originalObjs = %orig;
+    NSArray *filteredList = removeItemsInList(originalObjs, NO);
 
     if ([SCIUtils getBoolPref:@"prevent_doom_scrolling"]) {
         double reelCount = [SCIUtils getDoublePref:@"doom_scrolling_reel_count"];
@@ -146,29 +148,35 @@ static NSArray *removeItemsInList(NSArray *list, BOOL isFeed) {
 %end
 %hook IGContextualFeedViewController
 - (NSArray *)objectsForListAdapter:(id)arg1 {
+    NSArray *originalObjs = %orig;
+
     if ([SCIUtils getBoolPref:@"hide_ads"]) {
-        return removeItemsInList(%orig, NO);
+        return removeItemsInList(originalObjs, NO);
     }
 
-    return %orig;
+    return originalObjs;
 }
 %end
 %hook IGVideoFeedViewController
 - (NSArray *)objectsForListAdapter:(id)arg1 {
+    NSArray *originalObjs = %orig;
+
     if ([SCIUtils getBoolPref:@"hide_ads"]) {
-        return removeItemsInList(%orig, NO);
+        return removeItemsInList(originalObjs, NO);
     }
 
-    return %orig;
+    return originalObjs;
 }
 %end
 %hook IGChainingFeedViewController
 - (NSArray *)objectsForListAdapter:(id)arg1 {
+    NSArray *originalObjs = %orig;
+
     if ([SCIUtils getBoolPref:@"hide_ads"]) {
-        return removeItemsInList(%orig, NO);
+        return removeItemsInList(originalObjs, NO);
     }
 
-    return %orig;
+    return originalObjs;
 }
 %end
 %hook IGStoryAdPool
@@ -259,21 +267,25 @@ static NSArray *removeItemsInList(NSArray *list, BOOL isFeed) {
 // "Sponsored" posts on discover/search page
 %hook IGExploreListKitDataSource
 - (NSArray *)objectsForListAdapter:(id)arg1 {
+    NSArray *originalObjs = %orig;
+
     if ([SCIUtils getBoolPref:@"hide_ads"]) {
-        return removeItemsInList(%orig, NO);
+        return removeItemsInList(originalObjs, NO);
     }
 
-    return %orig;
+    return originalObjs;
 }
 %end
 // Demangled name: IGExploreViewControllerSwift.IGExploreListKitDataSource
 %hook _TtC28IGExploreViewControllerSwift26IGExploreListKitDataSource
 - (NSArray *)objectsForListAdapter:(id)arg1 {
+    NSArray *originalObjs = %orig;
+
     if ([SCIUtils getBoolPref:@"hide_ads"]) {
-        return removeItemsInList(%orig, NO);
+        return removeItemsInList(originalObjs, NO);
     }
 
-    return %orig;
+    return originalObjs;
 }
 %end
 
