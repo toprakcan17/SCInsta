@@ -1,13 +1,25 @@
 #import "../../Utils.h"
 
+static BOOL SCIBypassStickerInteractConfirm = NO;
+
 %hook IGStoryViewerTapTarget
 - (void)_didTap:(id)arg1 forEvent:(id)arg2 {
+    if (SCIBypassStickerInteractConfirm) {
+        %orig;
+        return;
+    }
+
     if ([SCIUtils getBoolPref:@"sticker_interact_confirm"]) {
         NSLog(@"[SCInsta] Confirm sticker interact triggered");
 
-        [SCIUtils showConfirmation:^(void) { %orig; }];
-    } else {
-        return %orig;
+        [SCIUtils showConfirmation:^{
+            SCIBypassStickerInteractConfirm = YES;
+            ((void (*)(id, SEL, id, id))objc_msgSend)(self, @selector(_didTap:forEvent:), arg1, arg2);
+            SCIBypassStickerInteractConfirm = NO;
+        }];
+        return;
     }
+
+    %orig;
 }
 %end

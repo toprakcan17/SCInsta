@@ -666,86 +666,127 @@ shouldPersistLastBugReportId:(id)arg6
 
 // Confirm buttons
 
+static BOOL SCIBypassFeedLikeConfirm = NO;
+static BOOL SCIBypassFeedRepostConfirm = NO;
+static BOOL SCIBypassReelsLikeConfirm = NO;
+static BOOL SCIBypassReelsRepostConfirm = NO;
+
 %hook IGFeedItemUFICell
 - (void)UFIButtonBarDidTapOnLike:(id)arg1 {
+    if (SCIBypassFeedLikeConfirm) {
+        %orig;
+        return;
+    }
+
     if ([SCIUtils getBoolPref:@"like_confirm"]) {
         NSLog(@"[SCInsta] Confirm post like triggered");
 
-        [SCIUtils showConfirmation:^(void) { %orig; }];
+        [SCIUtils showConfirmation:^{
+            SCIBypassFeedLikeConfirm = YES;
+            ((void (*)(id, SEL, id))objc_msgSend)(self, @selector(UFIButtonBarDidTapOnLike:), arg1);
+            SCIBypassFeedLikeConfirm = NO;
+        }];
+        return;
     }
-    else {
-        return %orig;
-    }  
+
+    %orig;
 }
 
 - (void)UFIButtonBarDidTapOnRepost:(id)arg1 {
+    if (SCIBypassFeedRepostConfirm) {
+        %orig;
+        return;
+    }
+
     if ([SCIUtils getBoolPref:@"repost_confirm"]) {
         NSLog(@"[SCInsta] Confirm repost triggered");
 
-        [SCIUtils showConfirmation:^(void) { %orig; }];
+        [SCIUtils showConfirmation:^{
+            SCIBypassFeedRepostConfirm = YES;
+            ((void (*)(id, SEL, id))objc_msgSend)(self, @selector(UFIButtonBarDidTapOnRepost:), arg1);
+            SCIBypassFeedRepostConfirm = NO;
+        }];
+        return;
     }
-    else {
-        return %orig;
-    }
+
+    %orig;
 }
 
 - (void)UFIButtonBarDidLongPressOnRepost:(id)arg1 {
     if ([SCIUtils getBoolPref:@"repost_confirm"]) {
         NSLog(@"[SCInsta] Confirm repost triggered (long press ignored)");
+        return;
     }
-    else {
-        return %orig;
-    }
+
+    %orig;
 }
 - (void)UFIButtonBarDidLongPressOnRepost:(id)arg1 withGestureRecognizer:(id)arg2 {
     if ([SCIUtils getBoolPref:@"repost_confirm"]) {
         NSLog(@"[SCInsta] Confirm repost triggered (long press ignored)");
+        return;
     }
-    else {
-        return %orig;
-    }
+
+    %orig;
 }
 %end
 
 %hook IGSundialViewerVerticalUFI
 - (void)_didTapLikeButton:(id)arg1 {
+    if (SCIBypassReelsLikeConfirm) {
+        %orig;
+        return;
+    }
+
     if ([SCIUtils getBoolPref:@"like_confirm_reels"]) {
         NSLog(@"[SCInsta] Confirm reels like triggered");
 
-        [SCIUtils showConfirmation:^(void) { %orig; }];
+        [SCIUtils showConfirmation:^{
+            SCIBypassReelsLikeConfirm = YES;
+            ((void (*)(id, SEL, id))objc_msgSend)(self, @selector(_didTapLikeButton:), arg1);
+            SCIBypassReelsLikeConfirm = NO;
+        }];
+        return;
     }
-    else {
-        return %orig;
-    }
+
+    %orig;
 }
 
 - (void)_didLongPressLikeButton:(id)arg1 {
     if ([SCIUtils getBoolPref:@"like_confirm_reels"]) {
         NSLog(@"[SCInsta] Confirm repost triggered (long press ignored)");
+        return;
     }
-    else {
-        return %orig;
-    }
+
+    %orig;
 }
 
 - (void)_didTapRepostButton:(id)arg1 {
+    if (SCIBypassReelsRepostConfirm) {
+        %orig;
+        return;
+    }
+
     if ([SCIUtils getBoolPref:@"repost_confirm"]) {
         NSLog(@"[SCInsta] Confirm repost triggered");
 
-        [SCIUtils showConfirmation:^(void) { %orig; }];
+        [SCIUtils showConfirmation:^{
+            SCIBypassReelsRepostConfirm = YES;
+            ((void (*)(id, SEL, id))objc_msgSend)(self, @selector(_didTapRepostButton:), arg1);
+            SCIBypassReelsRepostConfirm = NO;
+        }];
+        return;
     }
-    else {
-        return %orig;
-    }
+
+    %orig;
 }
 
 - (void)_didLongPressRepostButton:(id)arg1 {
     if ([SCIUtils getBoolPref:@"repost_confirm"]) {
         NSLog(@"[SCInsta] Confirm repost triggered (long press ignored)");
+        return;
     }
-    else {
-        return %orig;
-    }
+
+    %orig;
 }
 %end
 
